@@ -76,13 +76,15 @@ class TareasController extends Controller
             'quien_asume_costo' => 'nullable|in:Cliente,Propietario,Homeselect',
             'encargado' => 'required|exists:users,id', 
             'costo' => 'nullable|numeric|min:0',
-            'comentario' => 'nullable|string|max:500',
+            'comentario' => [
+                // Comentario es requerido solo si el estado es "Solucionada" o "No Solucionada"
+                function ($attribute, $value, $fail) use ($request) {
+                    if (in_array($request->estado, ['Solucionada', 'No Solucionada']) && empty($value)) {
+                        $fail('El comentario es obligatorio cuando el estado es "Solucionada" o "No Solucionada".');
+                    }
+                },
+            ],
         ]);
-
-        // Validar que el comentario sea obligatorio si el estado es "Solucionada" o "No Solucionada"
-        if (in_array($request->estado, ['Solucionada', 'No Solucionada']) && empty($request->comentario)) {
-            return back()->withErrors(['comentario' => 'El comentario es obligatorio cuando el estado es "Solucionada" o "No Solucionada".'])->withInput();
-        }
 
         // Obtener la tarea y actualizar los campos
         $tarea = Tarea::findOrFail($tarea_id);
