@@ -6,7 +6,7 @@ FROM
 JOIN 
     tareas t ON i.id = t.incidencia_id
 WHERE 
-    quien_asume_costo = 'Homeselect'  -- Asumimos que hay un campo "asumido_por" que indica quién asume el costo
+    quien_asume_costo = 'Homeselect' 
 GROUP BY 
     i.id
 ORDER BY 
@@ -20,7 +20,7 @@ FROM
 JOIN 
     tareas t ON i.id = t.incidencia_id
 WHERE 
-    quien_asume_costo = 'Homeselect'  -- Asumimos que hay un campo "asumido_por" que indica quién asume el costo
+    quien_asume_costo = 'Homeselect'  
 GROUP BY 
     i.id
 ORDER BY 

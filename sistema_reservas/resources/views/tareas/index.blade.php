@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container">
-    <h1>Tareas de la Incidencia: {{ $incidencia->titulo ?? 'Sin Título' }}</h1>
+    <h1>Tareas de la Incidencia</h1>
     <p><strong>Descripción de la Incidencia:</strong> {{ $incidencia->descripcion }}</p>
 
     <!-- Botón para crear nueva tarea -->

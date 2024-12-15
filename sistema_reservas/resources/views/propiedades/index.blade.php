@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="container">
-        <h1>Propiedades</h1>
+        <h1>Lista de Propiedades</h1>
         <a href="{{ route('propiedades.create') }}" class="btn btn-primary mb-3">Crear Propiedad</a>
         @if (session('success'))
             <div class="alert alert-success">
