@@ -29,7 +29,6 @@
         // Validación de disponibilidad y creación de reserva
         public function store(Request $request)
         {   
-            // Validar los datos de entrada
             $request->validate([
                 'propiedad_id' => 'required|exists:propiedades,id',
                 'user_id' => 'required|exists:users,id', 
@@ -37,11 +36,14 @@
                 'fecha_fin' => 'required|date|after:fecha_inicio',
             ]);
 
-            // Validar si la propiedad ya está reservada en las fechas proporcionadas
             $reservasExistentes = reserva::where('propiedad_id', $request->propiedad_id)
                 ->where(function($query) use ($request) {
                     $query->whereBetween('fecha_inicio', [$request->fecha_inicio, $request->fecha_fin])
-                        ->orWhereBetween('fecha_fin', [$request->fecha_inicio, $request->fecha_fin]);
+                        ->orWhereBetween('fecha_fin', [$request->fecha_inicio, $request->fecha_fin])
+                        ->orWhere(function ($query) use ($request) {
+                            $query->where('fecha_inicio', '<=', $request->fecha_inicio)
+                                    ->where('fecha_fin', '>=', $request->fecha_fin);
+                        });
                 })
                 ->exists();
 
@@ -49,13 +51,7 @@
                 return redirect()->back()->with('error', 'La propiedad ya está reservada en esas fechas.');
             }
 
-            // Crear la reserva con los datos correctos
-            reserva::create([
-                'propiedad_id' => $request->input('propiedad_id'),
-                'user_id' => $request->input('user_id'), 
-                'fecha_inicio' => $request->input('fecha_inicio'),
-                'fecha_fin' => $request->input('fecha_fin'),
-            ]);
+            reserva::create($request->all());
 
             return redirect()->route('reservas.index')->with('success', 'Reserva realizada exitosamente.');
         }
@@ -79,40 +75,33 @@
         // Actualizar una reserva
         public function update(Request $request, $id)
         {
-            // Validación de los datos recibidos
             $request->validate([
                 'propiedad_id' => 'required|exists:propiedades,id', 
                 'user_id' => 'required|exists:users,id', 
                 'fecha_inicio' => 'required|date|after_or_equal:today', 
                 'fecha_fin' => 'required|date|after:fecha_inicio', 
             ]);
-        
-            // Buscamos la reserva a actualizar
+
             $reserva = Reserva::findOrFail($id);
-        
-            
+
             $reservasExistentes = Reserva::where('propiedad_id', $request->propiedad_id)
-                ->where(function ($query) use ($request, $reserva) {
-                    // Verificamos si alguna reserva se solapa con las fechas de la reserva actual
+                ->where(function ($query) use ($request) {
                     $query->whereBetween('fecha_inicio', [$request->fecha_inicio, $request->fecha_fin])
-                        ->orWhereBetween('fecha_fin', [$request->fecha_inicio, $request->fecha_fin]);
+                        ->orWhereBetween('fecha_fin', [$request->fecha_inicio, $request->fecha_fin])
+                        ->orWhere(function ($query) use ($request) {
+                            $query->where('fecha_inicio', '<=', $request->fecha_inicio)
+                                    ->where('fecha_fin', '>=', $request->fecha_fin);
+                        });
                 })
-                ->where('id', '!=', $reserva->id) 
+                ->where('id', '!=', $reserva->id)
                 ->exists();
-        
+
             if ($reservasExistentes) {
-                // Si ya hay una reserva en esas fechas, retorna un mensaje de error
                 return redirect()->back()->with('error', 'La propiedad ya está reservada en esas fechas.');
             }
-        
-            // reserva con los nuevos datos
-            $reserva->update([
-                'propiedad_id' => $request->input('propiedad_id'),
-                'user_id' => $request->input('user_id'),
-                'fecha_inicio' => $request->input('fecha_inicio'),
-                'fecha_fin' => $request->input('fecha_fin'),
-            ]);
-        
+
+            $reserva->update($request->all());
+
             return redirect()->route('reservas.index')->with('success', 'Reserva actualizada exitosamente.');
         }
         

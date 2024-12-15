@@ -17,11 +17,12 @@ class Tarea extends Model
     {
         return $this->belongsTo(Incidencia::class);
     }
-// En el modelo Tarea
+
     public function encargado()
     {
-        return $this->belongsTo(User::class, 'encargado');
+        return $this->belongsTo(User::class, 'encargado_id');
     }
+
 
 
 }
