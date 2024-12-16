@@ -8,11 +8,13 @@
             @csrf
             @method('PUT')
 
+            <!-- Descripción -->
             <div class="form-group mb-3">
                 <label for="descripcion">Descripción</label>
                 <input type="text" name="descripcion" class="form-control" value="{{ old('descripcion', $tarea->descripcion) }}" readonly>
             </div>
 
+            <!-- Estado -->
             <div class="form-group mb-3">
                 <label for="estado">Estado</label>
                 <select name="estado" class="form-control">
@@ -21,11 +23,13 @@
                     <option value="Solucionada" {{ old('estado', $tarea->estado) == 'Solucionada' ? 'selected' : '' }}>Solucionada</option>
                     <option value="No Solucionada" {{ old('estado', $tarea->estado) == 'No Solucionada' ? 'selected' : '' }}>No Solucionada</option>
                 </select>
+                <!-- Mensaje de error si se requiere comentario -->
                 @if(in_array(old('estado', $tarea->estado), ['Solucionada', 'No Solucionada']) && !$errors->has('comentario'))
                     <small class="text-danger">El comentario es obligatorio cuando el estado es "Solucionada" o "No Solucionada".</small>
                 @endif
             </div>
 
+            <!-- Quién Asume el Costo -->
             <div class="form-group mb-3">
                 <label for="quien_asume_costo">Quién Asume el Costo</label>
                 <select name="quien_asume_costo" class="form-control">
@@ -35,6 +39,7 @@
                 </select>
             </div>
 
+            <!-- Encargado -->
             <div class="form-group mb-3">
                 <label for="encargado">Encargado</label>
                 <select name="encargado" class="form-control" required>
@@ -47,14 +52,21 @@
                 </select>
             </div>
 
+            <!-- Costo -->
             <div class="form-group mb-3">
                 <label for="costo">Costo</label>
                 <input type="number" name="costo" class="form-control" value="{{ old('costo', $tarea->costo) }}">
             </div>
 
+            <!-- Comentario -->
             <div class="form-group mb-3">
                 <label for="comentario">Comentario</label>
-                <textarea name="comentario" class="form-control">{{ old('comentario', $tarea->comentario) }}</textarea>
+                <textarea name="comentario" id="comentario" class="form-control" rows="4">{{ old('comentario', $tarea->comentario) }}</textarea>
+                @if ($errors->has('comentario'))
+                    <div class="text-danger">
+                        {{ $errors->first('comentario') }}
+                    </div>
+                @endif
             </div>
 
             <button type="submit" class="btn btn-primary">Actualizar Tarea</button>

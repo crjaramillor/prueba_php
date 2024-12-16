@@ -42,7 +42,14 @@ class TareasController extends Controller
             'quien_asume_costo' => 'nullable|in:Cliente,Propietario,Homeselect',
             'encargado' => 'required|exists:users,id', 
             'costo' => 'nullable|numeric|min:0',
-            'comentario' => 'nullable|string|max:500',
+            'comentario' => [
+                // Validación condicional para el campo comentario
+                function ($attribute, $value, $fail) use ($request) {
+                    if (in_array($request->estado, ['Solucionada', 'No Solucionada']) && empty($value)) {
+                        $fail('El comentario es obligatorio cuando el estado es "Solucionada" o "No Solucionada".');
+                    }
+                },
+            ],
         ]);
 
         // Crear la tarea
@@ -58,7 +65,6 @@ class TareasController extends Controller
 
         return redirect()->route('tareas.index', $request->incidencia_id)->with('success', 'Tarea creada exitosamente');
     }
-
     public function edit($tarea_id)
     {
         $tarea = Tarea::with('encargado')->findOrFail($tarea_id);
@@ -68,16 +74,16 @@ class TareasController extends Controller
 
         return view('tareas.edit', compact('tarea', 'usuarios'));
     }
-
     public function update(Request $request, $tarea_id)
     {
+        // Validación
         $request->validate([
             'estado' => 'required|in:Asignada,En Proceso,Solucionada,No Solucionada',
             'quien_asume_costo' => 'nullable|in:Cliente,Propietario,Homeselect',
-            'encargado' => 'required|exists:users,id', 
+            'encargado' => 'required|exists:users,id',
             'costo' => 'nullable|numeric|min:0',
             'comentario' => [
-                // Comentario es requerido solo si el estado es "Solucionada" o "No Solucionada"
+                // Validación condicional para el campo comentario
                 function ($attribute, $value, $fail) use ($request) {
                     if (in_array($request->estado, ['Solucionada', 'No Solucionada']) && empty($value)) {
                         $fail('El comentario es obligatorio cuando el estado es "Solucionada" o "No Solucionada".');
@@ -85,19 +91,21 @@ class TareasController extends Controller
                 },
             ],
         ]);
-
-        // Obtener la tarea y actualizar los campos
+    
+        // Actualizar la tarea
         $tarea = Tarea::findOrFail($tarea_id);
         $tarea->update([
             'estado' => $request->estado,
             'quien_asume_costo' => $request->quien_asume_costo,
-            'encargado_id' => $request->encargado, 
+            'encargado_id' => $request->encargado,
             'costo' => $request->costo,
             'comentario' => $request->comentario,
         ]);
-
-        return redirect()->route('tareas.index', $tarea->incidencia_id)->with('success', 'Tarea actualizada exitosamente.');
+    
+        return redirect()->route('tareas.index', $tarea->incidencia_id)
+            ->with('success', 'Tarea actualizada exitosamente.');
     }
+    
 
 
     public function destroy($tarea_id)

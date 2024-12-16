@@ -41,6 +41,9 @@
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-danger">Eliminar</button>
                             </form>
+                            <a href="{{ route('reservas.showPropiedad', $propiedad->id) }}" class="btn btn-info">
+                                Ver Reservas Asociadas
+                            </a>
                         </td>
                     </tr>
                 @endforeach

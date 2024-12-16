@@ -18,7 +18,6 @@ class Propiedades extends Model
         'owner_id',
         'description',
     ];
-
     public function owner()
     {
         return $this->belongsTo(User::class, 'owner_id');

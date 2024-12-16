@@ -22,5 +22,6 @@ Route::delete('propiedades/{propiedad}', [PropiedadesController::class, 'destroy
 
 Route::resource('reservas', ReservasController::class);
 Route::put('reservas/{id}', [ReservasController::class, 'update'])->name('reservas.update');
+Route::get('reservas/propiedad/{propiedad}', [ReservasController::class, 'showReservas'])->name('reservas.showPropiedad');
 
 
